@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        ul {
+            overflow: hidden
+        }
+
+        .address {
+            height: 100px;
+            text-align: center;
+            background-color: #00D9A3;
+            position: relative;
+            -webkit-transform: translateX(0px);
+        }
+
+        .liContent {
+            line-height: 50px;
+        }
+
+        .delete {
+            position: absolute;
+            width: 100px;
+            top: 0;
+            right: -100px;
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+            background-color: yellowgreen;
+        }
+    </style>
+</head>
+<body>
+<ul>
+    <li class="address">
+        <div class="liContent">
+            <div class="info">
+                <p>qwwww</p>
+            </div>
+            <div class="des">
+                <span>123</span>
+                <span>456</span>
+            </div>
+        </div>
+        <div class="delete">删除</div>
+    </li>
+    <li class="address">
+        <div class="liContent">2</div>
+        <div class="delete">删除</div>
+    </li>
+    <li class="address">
+        <div class="liContent">3</div>
+        <div class="delete">删除</div>
+    </li>
+</ul>
+
+</body>
+</html>
+<script src="jquery.js"></script>
+<script>
+    var initX = 0 ,moveX=0, X, initLiX;
+    var deleteW = $('.delete').width();
+    $('ul').on('touchstart', 'li', function (e) {
+        var $thisLi = $(this);
+        e.preventDefault();
+        moveX = initX = event.targetTouches[0].pageX;
+        initLiX = ($thisLi[0].style.WebkitTransform.replace(/translateX\(/g, "").replace(/px\)/g, "")) * 1;//取出touchstart时$thisLi的-webkit-transform：translateX的数值
+        $(document).on('touchmove.touchDelete', function (e) {
+            e.preventDefault();
+            moveX = event.targetTouches[0].pageX;
+            X = moveX - initX;
+            if (initLiX == 0) {
+                if (X >= 0) {
+                    $thisLi.css('-webkit-transform', 'translateX(' + 0 + 'px)')
+                } else if (X < 0) {
+                    $thisLi.css('-webkit-transform', 'translateX(' + X + 'px)');
+                    if (X < -deleteW) {
+                        $thisLi.css('-webkit-transform', 'translateX(-' + deleteW + 'px)')
+                    }
+                }
+            }else if (initLiX < 0) {
+                if (X <= 0) {
+                    $thisLi.css('-webkit-transform', 'translateX(-' + deleteW + 'px)')
+                } else if (X > 0) {
+                    var l = X - deleteW;
+                    $thisLi.css('-webkit-transform', 'translateX(' + l + 'px)');
+                    if (X > deleteW) {
+                        $thisLi.css('-webkit-transform', 'translateX(' + 0 + 'px)')
+                    }
+                }
+            }
+
+        });
+        $(document).on('touchend.touchDelete', function (e) {
+            e.preventDefault();
+            X = moveX - initX;
+            if (-5 < X && X < 5) {
+                alert('click')
+            } else {
+                initLiX = ($thisLi[0].style.WebkitTransform.replace(/translateX\(/g, "").replace(/px\)/g, "")) * 1;//取出touchstart时$thisLi的-webkit-transform：translateX的数值
+                if (initLiX > -deleteW/2) {
+                    $thisLi.css('-webkit-transform', 'translateX(' + 0 + 'px)');
+                    initLiX = 0;
+                } else {
+                    $thisLi.css('-webkit-transform', 'translateX(-' + deleteW + 'px)');
+                    initLiX = -80;
+                }
+            }
+            $(document).off('.touchDelete')
+        })
+    });
+
+</script>
